@@ -15,7 +15,7 @@ class CurrencyController {
 		if(isset($params['dbh']) && $params['dbh'] instanceOf PDO) {
 			$this->dbh = $params['dbh'];
 			// Because of a small error in setting up the local MAMP instance
-			// I had problems connect to the correct database while connection through the socket
+			// I had problems connecting to the correct database using the mysql MAMP socket
 			// Normally this would not be here
 			$this->dbh->query("USE wmf");
 		} else {
