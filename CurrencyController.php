@@ -28,7 +28,9 @@ class CurrencyController {
 	  * Params: String $url
 	  * Returns: cURL array result
 	  *
-	  * At 
+	  * At some point this could leverage some kind of framework such as Symfony 1/2 or Guzzle
+	  * Might also want to make this more customizeable by adding our own layer on top of cURL
+	  * to hadle a variety of requests
 	  */
 	public function getData($url) {
 		$ch = curl_init();
@@ -44,11 +46,30 @@ class CurrencyController {
 		return $output;
 	}
 
+	/**
+	  * Given an array, return an XML object
+	  * Params: array $data
+	  * Returns: SimpleXMLElement Obj
+	  *
+	  * This really doesn't do a whole bunch except create a simple object. Probably would need to
+	  * add some more sanity checks or maybe even parse from Obj to Array to make the other 
+	  * functions more modular
+	  */
 	public function parseData($data){
 		$xml = new SimpleXMLElement($data);
 		return $xml;
 	}
 
+	/**
+	  * Takes in a SimpleXMLElement Obj, insert/updates the data in the object
+	  * Params: SimpleXMLElement object $data
+	  * Returns: None
+	  *
+	  * To make this more modular we should standardize the data. So instead of getting a SimpleXML object we should be getting an array
+	  * I made an INSERT/DUPLICATE KEY UPDATE query because this would be more efficient at insert new data/updating new data.  Since the 
+	  * currencies rates probably change daily, we should need to call this method only once rather than a serious of methods
+	  * to update our table
+	  */
 	public function insertData($data) {
 		$tableName = 'daily_currency';
 		if($data instanceOf SimpleXMLElement) {
@@ -74,7 +95,16 @@ class CurrencyController {
 		}
 	}
 
-	public function convertCurrency($string) {
+	/**
+	  * Takes in a string of the format CURRENCY_NAME CURRENCY_RATE and returns a conversion to USD
+	  * Params: String $string
+	  * Returns: String $outputStr
+	  *
+	  * This is pretty specific to only converting from currency A to USD.  IF this were to be modular 
+	  * enough to convert from currency A to currency B we would need to refactor this to
+	  * get multiple currencies.  
+	  */
+	public function convertCurrencyToUSD($string) {
 		$output = preg_split( '/[,:| ]/', $string );
 
 		$query = "SELECT rate FROM daily_currency WHERE currency = " . $this->dbh->quote($output[0]);
@@ -87,7 +117,17 @@ class CurrencyController {
 
 	}
 
-	public function convertCurrencies(array $array) {
+	/**
+	  * Takes in an array of currencies in the format array(CURRENCY_NAME CURRENCY_RATE, CURRENCY_NAME CURRENCY_RATE, ...) and returns an array
+	  * of currencies all convereted to USD
+	  * Params: array $array
+	  * Returns: array $outputArray
+	  * 
+	  * I made the preg_split flexible enough to accept a variety of inputs such as:
+	  * JPY 5000; JPY,5000; JPY:5000
+	  * This is to allow for flexible data to be insert to our object
+	  */
+	public function convertCurrenciesToUSD(array $array) {
 		$outputArray = array();
 		foreach($array AS $pair) {
 			$output = preg_split( '/[,:| ]/', $pair );
