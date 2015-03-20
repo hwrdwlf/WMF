@@ -14,7 +14,7 @@ class CurrencyController {
 	public function __construct($params) {
 		if(isset($params['dbh']) && $params['dbh'] instanceOf PDO) {
 			$this->dbh = $params['dbh'];
-			// Because of a small in setting up the local MAMP instance
+			// Because of a small error in setting up the local MAMP instance
 			// I had problems connect to the correct database while connection through the socket
 			// Normally this would not be here
 			$this->dbh->query("USE wmf");
