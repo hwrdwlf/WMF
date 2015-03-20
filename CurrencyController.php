@@ -24,13 +24,13 @@ class CurrencyController {
 	}
 
 	/**
-	  * Make a cURL request based on some kind of URL and returns the specified result
+	  * Make a cURL request based on some kind of URL and return the specified result
 	  * Params: String $url
 	  * Returns: cURL array result
 	  *
 	  * At some point this could leverage some kind of framework such as Symfony 1/2 or Guzzle
 	  * Might also want to make this more customizeable by adding our own layer on top of cURL
-	  * to hadle a variety of requests
+	  * to handle a variety of requests
 	  */
 	public function getData($url) {
 		$ch = curl_init();
@@ -38,7 +38,11 @@ class CurrencyController {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
 		$output = curl_exec($ch);
 		curl_close($ch);  
-
+		
+		// If we get no response or no data throw an exception
+		// getting no data in this case means an external error
+		// TODO: See if throwing an exception is appropriate here
+		// Might be better to make a note and move on
 		if(empty($output)) {
 			throw new Exception('cURL did not return any data');
 		}
@@ -49,9 +53,9 @@ class CurrencyController {
 	/**
 	  * Given an array, return an XML object
 	  * Params: array $data
-	  * Returns: SimpleXMLElement Obj
+	  * Returns: SimpleXMLElement object
 	  *
-	  * This really doesn't do a whole bunch except create a simple object. Probably would need to
+	  * This really doesn't do a whole bunch except create an object. Probably would need to
 	  * add some more sanity checks or maybe even parse from Obj to Array to make the other 
 	  * functions more modular
 	  */
