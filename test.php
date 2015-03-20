@@ -22,7 +22,7 @@ $params = array(
 );
 
 try{
-	// instantiate our class
+	// instantiate an object
 	$cc = new CurrencyController($params);
 	// Get data from the API
 	$data = $cc->getData($url);
